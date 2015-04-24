@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="js/libs/jquery/jquery.js"></script>
+        <script src="js/libs/jqueryui/jquery-ui.js"></script>
+        <link rel="stylesheet" type="text/css" href="js/libs/jqueryui/css/base/jquery-ui.css">
+        <script>
+        $(startup);
+        
+        var setup="<table><tr>";
+        var tries=0;
+        var temp, card1, card2;
+        var inprogress=false;
+        function startup()
+        {
+            for (var x=1; x<=16; x+=1)
+            {
+                setup += "<td><div id='box" + x + "' class='card'></div></td>";
+                if(x==4 || x==8 || x ==12) setup += "</tr><tr>";
+            }
+            setup += "</table>";
+            $("#game").html(setup);
+            var imgs=[];
+           
+            for (var x=1; x<=8; x+=1)
+            {
+                imgs[x]=("images/card" + x + ".png");
+                temp="<img src='" + imgs[x] + "' width=100% class='hidden'>";
+                $("#box" + x).html(temp);
+                $("#box" + (x+8)).html(temp);
+            }
+            var x, y;
+            for (var shuffle=1; shuffle<=100; shuffle+=1)
+            {
+                x=Math.floor(Math.random()*16) + 1;
+                y=Math.floor(Math.random()*16) + 1;
+                temp =  $("#box" + x).html();
+                $("#box" + x).html($("#box" + y).html());
+                $("#box" + y).html(temp); 
+            }
+            $("div").click(reveal);
+        
+            function reveal(){
+                if(inprogress) return; //waiting to hide cards
+                //if clicking on revealed card dont do this code
+                if ($(this).children("img").hasClass('hidden')==false) return;
+                tries++;
+                if(tries==1) card1=$(this); //store first card
+                else card2=$(this); //store 2nd card
+                //reveal the card
+                $(this).children("img").removeClass('hidden');
+                if(tries==2) //wating to match or hide
+                {
+                    tries=0;
+                    inprogress=true; //dont let clicking of cards continue
+                    temp=setInterval(putaway, 1000); //wait 1 second
+                }
+            }
+            function putaway()
+            {
+                 inprogress=false;//can now click cards again
+                if (card1.children("img").attr("src") == card2.children("img").attr("src"))
+                    clearInterval(temp);//leabe cards up
+                else{
+                    card1.children("img").addClass('hidden');
+                    card2.children("img").addClass('hidden');
+                    clearInterval(temp); //hide cards
+                }
+            }
+        }
+        
+        
+    </script>
+    <style>
+        .card{
+            border: 1px solid black;
+            width: 100px;
+            height: 140px;
+            margin: 5px;
+            cursor: pointer;
+        }
+        .hidden{
+            display: none;
+        }
+        
+    </style>
+    </head>
+    <body>
+        <p id="game">
+            
+        </p>
+        
+    </body>
+</html>
